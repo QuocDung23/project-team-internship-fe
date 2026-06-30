@@ -1,16 +1,6 @@
-// Global clock so multiple components stay in sync and time-ago labels
-// recompute on a single interval instead of one per row.
-
-import { useEffect, useState } from "react";
-
-export function useTicker(intervalMs = 1000): number {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(Date.now()), intervalMs);
-    return () => window.clearInterval(id);
-  }, [intervalMs]);
-  return now;
-}
+// Formatters shared across the app. Kept tiny and dependency-free so they
+// can be reused in both UI and (later) data pipelines without dragging
+// React into a Node context.
 
 export function formatAgo(ts: number, now: number): string {
   const diff = Math.max(0, now - ts);

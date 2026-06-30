@@ -2,7 +2,7 @@
 // and a status badge. Used four times on the right rail of the console.
 
 import { StatusBadge } from "./StatusBadge";
-import type { MetricStatus } from "../mockMetrics";
+import type { MetricStatus } from "../../../data/mockMetrics";
 
 interface MetricCardProps {
   label: string;

@@ -22,6 +22,8 @@ export interface Driver {
   position: GeoPoint;
   lastUpdate: number;     // epoch ms
   totalAlerts: number;    // accumulated alerts over current shift
+  onPhone: boolean;       // derived: driver holding phone
+  seatbelt: boolean;      // derived: seatbelt fastened
 }
 
 export type AlertType = "drowsiness_alert" | "yawn_alert" | "distraction_alert";

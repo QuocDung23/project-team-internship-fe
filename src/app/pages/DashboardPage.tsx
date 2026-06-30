@@ -10,10 +10,10 @@ import {
   ArrowUpRight,
   ClockClockwise,
 } from "@phosphor-icons/react";
-import { useFleetStore } from "../../store/fleetStore";
-import { useTicker, formatTime } from "../../hooks/useTicker";
-import { StatusBadge } from "../../features/monitoring/components/StatusBadge";
-import type { DriverStatus } from "../../types/fleet";
+import { useFleetStore } from "../store/fleetStore";
+import { useTicker, formatTime } from "../hook/useTicker";
+import { StatusBadge } from "../component/ui/monitoring/StatusBadge";
+import type { DriverStatus } from "../types";
 
 interface KpiCardProps {
   label: string;

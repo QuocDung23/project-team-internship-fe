@@ -2,8 +2,8 @@
 // being monitored at a glance plus a route status pill.
 
 import { Car, Phone, IdentificationCard, MapPin } from "@phosphor-icons/react";
-import type { Driver } from "../../../types/fleet";
-import type { MetricStatus } from "../mockMetrics";
+import type { Driver } from "../../../types";
+import type { MetricStatus } from "../../../data/mockMetrics";
 import { StatusBadge } from "./StatusBadge";
 
 interface DriverHeaderProps {

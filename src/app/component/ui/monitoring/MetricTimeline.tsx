@@ -3,7 +3,7 @@
 // threshold markers so an operator can spot a drowsy event at a glance.
 
 import { motion } from "motion/react";
-import type { MetricSeries, MetricStatus } from "../mockMetrics";
+import type { MetricSeries, MetricStatus } from "../../../data/mockMetrics";
 
 interface MetricTimelineProps {
   series: Record<"ear" | "mar" | "pitch", MetricSeries>;
@@ -230,7 +230,7 @@ export function MetricTimeline({ series }: MetricTimelineProps) {
           })}
 
           {/* X-axis ticks (every 30s) */}
-          {[-120, -90, -60, -30, 0].map((sec, i) => {
+          {([-120, -90, -60, -30, 0] as const).map((sec, i) => {
             const x = PAD_L + ((sec + 120) / 120) * innerW;
             return (
               <g key={i}>

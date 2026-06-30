@@ -2,7 +2,7 @@
 // has a write-side that doesn't require a backend yet.
 
 import { create } from "zustand";
-import type { Driver, DriverStatus, EyeState } from "../types/fleet";
+import type { Driver, DriverStatus, EyeState } from "../types";
 import { useFleetStore } from "./fleetStore";
 
 interface RosterState {

@@ -3,7 +3,7 @@
 // can render the tail of the stream.
 
 import { create } from "zustand";
-import type { FleetEvent } from "../types/fleet";
+import type { FleetEvent } from "../types";
 
 interface AlertState {
   log: FleetEvent[];

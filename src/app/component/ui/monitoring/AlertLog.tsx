@@ -2,15 +2,15 @@
 // Highlights severity via the same locked palette used everywhere else.
 
 import { Bell, Lightning } from "@phosphor-icons/react";
-import type { MockAlert } from "../mockMetrics";
-import { formatAgo, useTicker } from "../../../hooks/useTicker";
+import type { MockAlert } from "../../../data/mockMetrics";
+import { formatAgo } from "../../../hook/useTicker";
 
 interface AlertLogProps {
   alerts: MockAlert[];
+  now: number;
 }
 
-export function AlertLog({ alerts }: AlertLogProps) {
-  const now = useTicker(1000);
+export function AlertLog({ alerts, now }: AlertLogProps) {
   return (
     <section className="panel px-4 py-4">
       <header className="mb-3 flex items-center justify-between">

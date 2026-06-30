@@ -1,35 +1,42 @@
-// Driver detail monitoring page. Wires mock telemetry into a single
-// operator-focused console layout.
+// Container for the driver monitoring console. Owns all state: tick interval,
+// mock metrics snapshot/series, and derived status values. Renders the layout
+// shell and delegates pure UI to child components.
 
 import { useEffect, useState } from "react";
 import {
   getMockMetrics,
   tickMockMetrics,
+  bucket,
+  bucketReverse,
+  bucketAbs,
+  overall,
+  statusWord,
+  dwsStatusFn,
+  dwsLabelFn,
   type DriverSnapshot,
-} from "../../features/monitoring/mockMetrics";
-import { seedDrivers } from "../../features/fleet/seed";
-import { useTicker } from "../../hooks/useTicker";
-import { DriverHeader } from "../../features/monitoring/components/DriverHeader";
-import { CabinCam } from "../../features/monitoring/components/CabinCam";
-import { MetricCard } from "../../features/monitoring/components/MetricCard";
-import { HeadFaceCard } from "../../features/monitoring/components/HeadFaceCard";
-import { MetricTimeline } from "../../features/monitoring/components/MetricTimeline";
-import { AlertLog } from "../../features/monitoring/components/AlertLog";
-import type { Driver } from "../../types/fleet";
+} from "../data/mockMetrics";
+import { seedDrivers } from "../data/seed";
+import { useTicker } from "../hook/useTicker";
+import { DriverHeader } from "../component/ui/monitoring/DriverHeader";
+import { CabinCam } from "../component/ui/monitoring/CabinCam";
+import { MetricCard } from "../component/ui/monitoring/MetricCard";
+import { HeadFaceCard } from "../component/ui/monitoring/HeadFaceCard";
+import { MetricTimeline } from "../component/ui/monitoring/MetricTimeline";
+import { AlertLog } from "../component/ui/monitoring/AlertLog";
+import type { Driver } from "../types";
 
-export function MonitoringPage() {
-  // Use the first seeded driver as the "currently monitored" subject.
+export function MonitoringView() {
   const driver: Driver = seedDrivers()[0]!;
   const bundle = getMockMetrics();
 
-  // Hold both the latest snapshot and the series locally so we can rerender
-  // on every tick without rebuilding the bundle (which keeps sparklines
-  // referentially stable per sample).
   const [series, setSeries] = useState(bundle.series);
   const [snap, setSnap] = useState<DriverSnapshot>(bundle.snapshot);
 
-  // Light tick so the dashboard reads as a live feed (matches the 2.2s
-  // cadence of the real WebSocket mock).
+  // Sync time for formatAgo in AlertLog. Runs every 1s so the "Xm trước"
+  // labels stay current without a full re-tick.
+  const now = useTicker(1000);
+
+  // Drive the mock telemetry feed at the same cadence as the real backend.
   useTicker(2200);
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -40,6 +47,7 @@ export function MonitoringPage() {
     return () => window.clearInterval(id);
   }, []);
 
+  // Derived metrics.
   const earStatus = bucket(snap.ear, 0.22, 0.16);
   const marStatus = bucketReverse(snap.mar, 0.55, 0.70);
   const pitchStatus = bucketAbs(snap.pitch, 20, 28);
@@ -54,6 +62,7 @@ export function MonitoringPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.55fr_1fr]">
+        {/* Left column: camera, timeline, alerts */}
         <div className="flex flex-col gap-4">
           <CabinCam
             eyesOpen={snap.eyesOpen}
@@ -62,9 +71,10 @@ export function MonitoringPage() {
             seatbelt={snap.seatbelt}
           />
           <MetricTimeline series={series} />
-          <AlertLog alerts={bundle.alerts} />
+          <AlertLog alerts={bundle.alerts} now={now} />
         </div>
 
+        {/* Right column: metric tiles */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1">
           <MetricCard
             label="EAR"
@@ -89,8 +99,8 @@ export function MonitoringPage() {
             label="DWS Score"
             value={String(snap.dwsScore)}
             unit="/100"
-            status={dwsStatus(snap.dwsScore)}
-            statusLabel={dwsLabel(snap.dwsScore)}
+            status={dwsStatusFn(snap.dwsScore)}
+            statusLabel={dwsLabelFn(snap.dwsScore)}
             thresholds={{ warn: 60, critical: 40 }}
             higherIsWorse
             range={{ min: 0, max: 100 }}
@@ -127,63 +137,4 @@ export function MonitoringPage() {
       </footer>
     </div>
   );
-}
-
-// --- Status derivation helpers (locked to the same threshold table used in
-// the metric cards so the right rail and timeline never disagree).
-
-type S = DriverSnapshot["status"];
-
-function bucket(value: number, warn: number, critical: number): S {
-  if (value <= critical) return "critical";
-  if (value <= warn) return "warn";
-  return "active";
-}
-
-function bucketReverse(value: number, warn: number, critical: number): S {
-  if (value >= critical) return "critical";
-  if (value >= warn) return "warn";
-  return "active";
-}
-
-function bucketAbs(value: number, warn: number, critical: number): S {
-  const abs = Math.abs(value);
-  if (abs >= critical) return "critical";
-  if (abs >= warn) return "warn";
-  return "active";
-}
-
-function overall(s: DriverSnapshot): S {
-  const rules: S[] = [
-    bucket(s.ear, 0.22, 0.16),
-    bucketReverse(s.mar, 0.55, 0.70),
-    bucketAbs(s.pitch, 20, 28),
-  ];
-  if (rules.includes("critical") || s.onPhone) return "critical";
-  if (rules.includes("warn")) return "warn";
-  return "active";
-}
-
-function statusWord(s: S): string {
-  switch (s) {
-    case "active":
-      return "Bình thường";
-    case "warn":
-      return "Cảnh báo";
-    case "critical":
-      return "Nguy hiểm";
-  }
-}
-
-function dwsStatus(score: number): S {
-  if (score < 40) return "critical";
-  if (score < 60) return "warn";
-  return "active";
-}
-
-function dwsLabel(score: number): string {
-  if (score < 40) return "Nguy hiểm";
-  if (score < 60) return "Cần chú ý";
-  if (score < 80) return "Ổn định";
-  return "An toàn";
 }

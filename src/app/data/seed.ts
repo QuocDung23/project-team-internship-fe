@@ -2,7 +2,7 @@
 // Realistic Vietnamese driver names + HCM-leaning coordinates so the fleet map
 // renders with believable positions instead of generic stock data.
 
-import type { Driver, GeoPoint } from "../../types/fleet";
+import type { Driver, GeoPoint } from "../types";
 
 const HCM_CENTER: GeoPoint = { lat: 10.762622, lng: 106.660172 };
 
@@ -13,7 +13,7 @@ function offsetKm(kmX: number, kmY: number): GeoPoint {
   return { lat: HCM_CENTER.lat + dLat, lng: HCM_CENTER.lng + dLng };
 }
 
-const SEED_DRIVERS: ReadonlyArray<Omit<Driver, "ear" | "eyeState" | "lastUpdate" | "totalAlerts" | "status">> = [
+const SEED_DRIVERS: ReadonlyArray<Omit<Driver, "ear" | "eyeState" | "lastUpdate" | "totalAlerts" | "status" | "onPhone" | "seatbelt">> = [
   { id: "D-1041", name: "Nguyễn Minh Quân",  phone: "+84 909 184 712", licensePlate: "51H-287.41", team: "Khu vực 1", position: offsetKm( -2.4,  3.1) },
   { id: "D-1042", name: "Trần Văn Khoa",     phone: "+84 907 632 118", licensePlate: "51F-902.16", team: "Khu vực 1", position: offsetKm(  1.8,  2.6) },
   { id: "D-1043", name: "Lê Hoàng Anh",      phone: "+84 933 471 092", licensePlate: "50L-318.55", team: "Khu vực 1", position: offsetKm(  4.7, -0.4) },
@@ -36,6 +36,7 @@ function buildInitialDrivers(): Driver[] {
   const now = Date.now();
   return SEED_DRIVERS.map((d, i) => {
     const eyeState: Driver["eyeState"] = i % 5 === 0 ? "closed" : i % 7 === 0 ? "yawning" : "open";
+    const onPhone = Math.random() > 0.88;
     return {
       ...d,
       status: "active",
@@ -43,6 +44,8 @@ function buildInitialDrivers(): Driver[] {
       eyeState,
       lastUpdate: now - i * 4_000,
       totalAlerts: Math.max(0, ((i * 37) % 9)),
+      onPhone,
+      seatbelt: true,
     };
   });
 }

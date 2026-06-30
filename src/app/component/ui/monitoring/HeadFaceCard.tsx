@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 import { Eye, EyeSlash, Phone, Warning, ShieldCheck } from "@phosphor-icons/react";
 import { StatusBadge } from "./StatusBadge";
-import type { MetricStatus } from "../mockMetrics";
+import type { MetricStatus } from "../../../data/mockMetrics";
 
 interface HeadFaceCardProps {
   eyesOpen: boolean;

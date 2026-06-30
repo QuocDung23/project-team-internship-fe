@@ -8,8 +8,8 @@ import type {
   DriverStatus,
   FleetEvent,
   SocketEnvelope,
-} from "../types/fleet";
-import { EYE_CLOSED_EAR, EYE_OPEN_EAR, seedDrivers } from "../features/fleet/seed";
+} from "../types";
+import { EYE_CLOSED_EAR, EYE_OPEN_EAR, seedDrivers } from "../data/seed";
 
 type Listener<T> = (payload: T) => void;
 

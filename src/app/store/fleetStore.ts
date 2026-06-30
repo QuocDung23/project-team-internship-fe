@@ -2,7 +2,7 @@
 // rather than re-built each tick, so referential equality on UI rows is preserved.
 
 import { create } from "zustand";
-import type { Driver } from "../types/fleet";
+import type { Driver } from "../types";
 import { getSocket } from "../services/socket";
 
 interface FleetState {
@@ -19,7 +19,7 @@ export const useFleetStore = create<FleetState>((set) => ({
   hydrate: () => {
     const initial: Record<string, Driver> = {};
     // Seed import is deferred to avoid a circular dep with the socket service.
-    import("../features/fleet/seed").then(({ seedDrivers }) => {
+    import("../data/seed").then(({ seedDrivers }) => {
       seedDrivers().forEach((d) => {
         initial[d.id] = d;
       });

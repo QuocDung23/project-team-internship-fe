@@ -1,7 +1,7 @@
 // Atomic status badge. Locked color palette so status meaning is consistent
 // across the whole console (Color Consistency Lock).
 
-import type { MetricStatus } from "../mockMetrics";
+import type { MetricStatus } from "../../../data/mockMetrics";
 
 type Tone = MetricStatus | "neutral";
 
